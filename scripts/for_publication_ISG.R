@@ -13,7 +13,6 @@ load(file = "data/processed_data/physeq_WGS_2022_10_20_Baseline.RData")
 df_metadata <- data.frame(sample_data(physeq_WGS_2022_10_20_Baseline))
 
 
-
 # ────────────────────────────────────────────────────────────────────────────────────────────────────
 # Alpha Diversity
 # ────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -87,7 +86,7 @@ fig_isg_tax <- physeq_WGS_2022_10_20_Baseline %>%
     comp_barplot(
         tax_level = "Species", n_taxa = 20,
         sample_order = "asis",
-        palette = myPal, label = "patient_group"
+        palette = myPal, label = "pt_id"
     ) +
     facet_wrap(~estimate_isg, scales = "free_x") +
     # ggtitle("Overall Estimate ISG score category") +
@@ -98,7 +97,7 @@ save(fig_isg_tax, file = "output/figures/top_n_taxa/top_20_species_by_estimate_i
 ggsave("output/figures/top_n_taxa/top_20_species_by_ISG_score_category_mOS.pdf", height = 8, width = 13)
 
 fig_isg_tax$data %>%
-    dplyr::select(patient_group, estimate_isg, Species, Abundance) %>%
+    dplyr::select(pt_id, estimate_isg, Species, Abundance) %>%
     write_csv("output/figures/top_n_taxa/top_20_species_by_isg.csv")
 
 

@@ -82,7 +82,7 @@ fig_med_tax <- physeq_WGS_2022_10_20_Baseline %>%
     comp_barplot(
         tax_level = "Species", n_taxa = 20,
         sample_order = "asis",
-        palette = myPal, label = "patient_group"
+        palette = myPal, label = "pt_id"
     ) +
     facet_wrap(~mOS_cat_whole, scales = "free_x") +
     guides(fill = guide_legend(ncol = 1)) +
@@ -92,7 +92,7 @@ save(fig_med_tax, file = "output/figures/top_n_taxa/top_20_species_by_mOS.RData"
 
 # Save data for supplementary table
 fig_med_tax$data %>%
-    dplyr::select(patient_group, mOS_cat_whole, Species, Abundance) %>%
+    dplyr::select(pt_id, mOS_cat_whole, Species, Abundance) %>%
     write_csv("output/figures/top_n_taxa/top_20_species_by_mOS.csv")
 
 
