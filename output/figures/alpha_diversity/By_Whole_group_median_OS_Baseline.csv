@@ -11,9 +11,6 @@ Above Median,Shannon,2.7510849661514882
 Below Median,InvSimpson,14.115120801623217
 Below Median,Observed,101
 Below Median,Shannon,3.1175279483736493
-Above Median,InvSimpson,13.875468800001471
-Above Median,Observed,124
-Above Median,Shannon,3.2135792175865197
 Above Median,InvSimpson,2.599290644481153
 Above Median,Observed,114
 Above Median,Shannon,1.9831595764839485
@@ -47,9 +44,6 @@ Below Median,Shannon,3.2920683553484835
 Above Median,InvSimpson,9.754205443821169
 Above Median,Observed,83
 Above Median,Shannon,2.6964457099797965
-Above Median,InvSimpson,14.472258948029841
-Above Median,Observed,96
-Above Median,Shannon,3.148638722404725
 Below Median,InvSimpson,15.090634927244333
 Below Median,Observed,91
 Below Median,Shannon,3.19200850131894
