@@ -9,6 +9,14 @@ source("src/common_functions.R")
 # Load the phyloseq object
 load(file = "data/processed_data/physeq_WGS_2022_10_20_Baseline.RData")
 
+# Set metadata variable
+df_metadata <- data.frame(sample_data(physeq_WGS_2022_10_20_Baseline))
+
+
+# Remove IDH mutant samples ----
+physeq_WGS_2022_10_20_Baseline_mod <- physeq_WGS_2022_10_20_Baseline %>%
+    ps_filter(!grepl("m", pt_id))
+
 
 # Figures by OS ----
 # By Whole group OS 568 days ----
@@ -20,7 +28,7 @@ load(file = "data/processed_data/physeq_WGS_2022_10_20_Baseline.RData")
 
 # By Median OS 568 days cut-off  ----
 
-df_alpha_final_phyloseq <- estimate_richness(physeq_WGS_2022_10_20_Baseline) %>%
+df_alpha_final_phyloseq <- estimate_richness(physeq_WGS_2022_10_20_Baseline_mod) %>%
     rownames_to_column(var = "sample_id") %>%
     mutate(sample_id = gsub("\\.", "-", sample_id)) %>%
     inner_join(df_metadata, by = c("sample_id")) %>%
@@ -76,8 +84,13 @@ ggsave("output/figures/alpha_diversity/By_Whole_group_median_OS_Baseline.pdf", w
 # Top Taxa
 # ────────────────────────────────────────────────────────────────────────────────────────────────────
 
+# Set palette
+myPal <- tax_palette(physeq_WGS_2022_10_20_Baseline_mod, rank = "Species", pal = "brewerPlus", n = 30)
+
+
+
 # Top taxa plot ---
-fig_med_tax <- physeq_WGS_2022_10_20_Baseline %>%
+fig_med_tax <- physeq_WGS_2022_10_20_Baseline_mod %>%
     speedyseq::mutate_sample_data(mOS_cat_whole = factor(mOS_cat_whole, levels = c("Below Median", "Above Median"))) %>%
     comp_barplot(
         tax_level = "Species", n_taxa = 20,
@@ -101,7 +114,7 @@ fig_med_tax$data %>%
 # ────────────────────────────────────────────────────────────────────────────────────────────────────
 
 # By whole group median OS ----
-fig_beta_mOS <- plot_beta_diversity_with_adonis2(physeq_WGS_2022_10_20_Baseline, sample_param = "mOS_cat_whole") +
+fig_beta_mOS <- plot_beta_diversity_with_adonis2(physeq_WGS_2022_10_20_Baseline_mod, sample_param = "mOS_cat_whole") +
     scale_color_manual(values = c("Above Median" = "blue", "Below Median" = "red")) +
     labs(color = "OS Category") +
     geom_point(size = 4, shape = 21, stroke = 2) +
@@ -119,7 +132,7 @@ ggsave("output/figures/beta_diversity/by_Median_OS_whole_Group.pdf", width = 12,
 # Differential abundance -----
 # Run ANCOMBC
 
-physeq_WGS_2022_10_20_Baseline_glommed <- speedyseq::tax_glom(physeq_WGS_2022_10_20_Baseline, taxrank = "Species") %>%
+physeq_WGS_2022_10_20_Baseline_mod_glommed <- speedyseq::tax_glom(physeq_WGS_2022_10_20_Baseline_mod, taxrank = "Species") %>%
     speedyseq::mutate_sample_data(mOS_cat_whole = factor(
         mOS_cat_whole,
         levels = c("Below Median", "Above Median")
@@ -127,20 +140,20 @@ physeq_WGS_2022_10_20_Baseline_glommed <- speedyseq::tax_glom(physeq_WGS_2022_10
 
 
 # Get taxa table
-tax_table_asv <- data.frame(tax_table(physeq_WGS_2022_10_20_Baseline_glommed)) %>%
+tax_table_asv <- data.frame(tax_table(physeq_WGS_2022_10_20_Baseline_mod_glommed)) %>%
     rownames_to_column(var = "tax_id") %>%
     dplyr::select(1, Species)
 
 
 # Get prevalence
 df_prev <- get_phyloseq_prev_by_group(
-    physeq = physeq_WGS_2022_10_20_Baseline_glommed,
+    physeq = physeq_WGS_2022_10_20_Baseline_mod_glommed,
     sample_param = "mOS_cat_whole", taxa_rank = "Species"
 )
 
 
 
-df_metadata_N <- data.frame(sample_data(physeq_WGS_2022_10_20_Baseline_glommed)) %>%
+df_metadata_N <- data.frame(sample_data(physeq_WGS_2022_10_20_Baseline_mod_glommed)) %>%
     group_by(estimate_isg) %>%
     tally()
 
@@ -148,7 +161,7 @@ df_metadata_N <- data.frame(sample_data(physeq_WGS_2022_10_20_Baseline_glommed))
 
 
 ancombc_bc_by_mOS <- ancombc(
-    phyloseq = physeq_WGS_2022_10_20_Baseline_glommed,
+    phyloseq = physeq_WGS_2022_10_20_Baseline_mod_glommed,
     formula = "mOS_cat_whole", p_adj_method = "fdr",
     group = "mOS_cat_whole", struc_zero = T, neg_lb = TRUE, tol = 1e-5,
     prv_cut = 0.30,
